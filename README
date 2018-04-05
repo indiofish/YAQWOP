@@ -7,4 +7,11 @@ The intended goal of the project is to write a bot able to play QWOP
 principles.
 
 Interaction with QWOP will be made via QWOPPER by slowfrog.
+
+QWOPPER MANUAL:
+Running 'ant package' in the top-level directory should produce a jar file in the dist/ directory. 
+Running the jar directly will open a small UI where you can launch some runs. The simulation can also be run from the command line like 'java -cp dist/qwopper.jar com.slowfrog.qwop.ui.Main 10 5'. 
+That will run five different random athletes, each one for ten tries. 
+Currently, that simulation automatically stops the runner after one minute, to avoid wasting too much time on the first batch.
+
 (http://slowfrog.blogspot.com/2011/03/genetically-engineered-qwop-part-1.html)
