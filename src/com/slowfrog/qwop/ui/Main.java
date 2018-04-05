@@ -4,6 +4,7 @@ import java.awt.Robot;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.*;
 
 import com.slowfrog.qwop.ConsoleLog;
 import com.slowfrog.qwop.Log;
@@ -13,6 +14,8 @@ import com.slowfrog.qwop.RunInfo;
 public class Main {
 
   private static final Log LOG = new ConsoleLog();
+  private static Robot rob;
+  private static Qwopper qwop;
 
   public static void main(String[] args) {
 
@@ -32,20 +35,28 @@ public class Main {
       }
     }
 
+
     try {
-      Robot rob = new Robot();
-      Qwopper qwop = new Qwopper(rob, LOG);
+      rob = new Robot();
+      qwop = new Qwopper(rob, LOG);
       qwop.findRealOrigin();
-      for (int round = 0; round < count; ++round) {
-        if (count > 1) {
-          str = Qwopper.makeRealisticRandomString(30);
-        }
-        testString(qwop, str, tries, round);
-      }
 
     } catch (Throwable t) {
       LOG.log("Error", t);
     }
+  }
+
+  public static RunInfo playOneGame(String str)
+  {
+    RunInfo info;
+    try {
+      qwop.findRealOrigin();
+    } catch (Throwable t) {
+      LOG.log("Error", t);
+    }
+    qwop.startGame();
+    info = qwop.playOneGame(str, 60000);
+    return info;
   }
 
   private static void testString(Qwopper qwop, String str, int count, int round) {
