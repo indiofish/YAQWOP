@@ -35,8 +35,39 @@ public class Qwopper {
   /** Interval between two speed checks. */
   private static final int CHECK_INTERVAL = 1000;
 
-  /** All possible 'notes' */
-  private static final String NOTES = "QWOPqwop++";
+  /** All possible 'notes'
+  */
+  private static final String NOTES = "ABCDEFGHIJKLMNOP";
+  /** State Transition Table.
+   * QWOP's runner can be viewed as a state machine consisting of 16 states
+   * where each state is a combination of the letters Q,W,O,P. 
+   * (Referenced from "Evolving QWOP Gaits")
+   * 
+   * Not only does this notation makes crossover and mutation easy,
+   * but also has the additional benefit of using difference as index 
+   * (e.g. TABLE['C' - 'A']) to determine which state we are in.
+   * ABC will be translated into qwop+qwoP+qwOp+ 
+   * which means release all keys, wait(for 150ms), Press P, wait, then press O and release P.
+   */ 
+  private static final String[] TRANSITION_TABLE = 
+  { 
+    "qwop", // A
+    "qwoP", // B
+    "qwOp", // C
+    "qwOP", // D
+    "qWop", // E
+    "qWoP", // F
+    "qWOp", // G
+    "qWOP", // H
+    "Qwop", // I
+    "QwoP", // J
+    "QwOp", // K
+    "QwOP", // L
+    "QWop", // M
+    "QWoP", // N
+    "QWOp", // O
+    "QWOP" // P
+  };
 
   /**
    * Number of consecutive runs before we trigger a reload of the browser to
@@ -64,13 +95,13 @@ public class Qwopper {
   private static boolean matchesBlueBorder(BufferedImage img, int x, int y) {
     int refColor = 0x9dbcd0;
     return ((y > 4) && (y < img.getHeight() - 4) && (x < img.getWidth() - 12) &&
-            colorMatches(img.getRGB(x, y), refColor) &&
-            colorMatches(img.getRGB(x + 4, y), refColor) &&
-            colorMatches(img.getRGB(x + 8, y), refColor) &&
-            colorMatches(img.getRGB(x + 12, y), refColor) &&
-            colorMatches(img.getRGB(x, y + 4), refColor) &&
-            !colorMatches(img.getRGB(x, y - 4), refColor) && !colorMatches(
-        img.getRGB(x + 4, y + 4), refColor));
+        colorMatches(img.getRGB(x, y), refColor) &&
+        colorMatches(img.getRGB(x + 4, y), refColor) &&
+        colorMatches(img.getRGB(x + 8, y), refColor) &&
+        colorMatches(img.getRGB(x + 12, y), refColor) &&
+        colorMatches(img.getRGB(x, y + 4), refColor) &&
+        !colorMatches(img.getRGB(x, y - 4), refColor) && !colorMatches(
+          img.getRGB(x + 4, y + 4), refColor));
   }
 
   /**
@@ -81,7 +112,7 @@ public class Qwopper {
     int ax = x;
     int ay = y;
 
-    OUTER_LOOP:
+OUTER_LOOP:
 
     while (ax >= 0) {
       --ax;
@@ -132,78 +163,103 @@ public class Qwopper {
   }
 
   /**
-   * Play a string. Interpret a string of QWOPqwop+ as a music sheet.
-   * <ul>
-   * <li>QWOP means press the key Q, W, O or P</li>
-   * <li>qwop means release the key</li>
-   * <li>+ means wait for a small delay</li>
-   * </ul>
+   * Translate ABCD encoding to QWOPqwop+ encoding.
+   * We will keep using playString because I don't want to write it again.
    */
+  private String decodeString(String str) {
+    String result = "";
+    int len = str.length();
+    char base = 'A';
+    char c;
+
+    for (int i = 0; i < len ; i++) {
+      c = str.charAt(i);
+
+      // I won't be worried about performance as of now 
+      // so say no to StringBuilder.
+      result += TRANSITION_TABLE[c-base] + "+";  
+    }
+    
+    return result;
+  }
+
+  /**
+   * Play a string. Interpret a string of ABCD... into QWOPqwop+ 
+   * then play it as a music sheet.
+   * QWOP means press the key Q, W, O or P
+   * qwop means release the key
+   * + means wait for a small delay
+   */
+
   private void playString(String str) {
-    this.string = str;
+    String decodedString = decodeString(str);
+    System.out.println(decodedString);
+    this.string = decodedString;
     long lastTick = System.currentTimeMillis();
-    for (int i = 0; i < str.length(); ++i) {
+    int len = decodedString.length();
+    for (int i = 0; i < len; ++i) {
       if (stop) {
         return;
       }
-      char c = str.charAt(i);
+      char c = decodedString.charAt(i);
       switch (c) {
-      case 'Q':
-        rob.keyPress(KeyEvent.VK_Q);
-        break;
+        case 'Q':
+          rob.keyPress(KeyEvent.VK_Q);
+          break;
 
-      case 'W':
-        rob.keyPress(KeyEvent.VK_W);
-        break;
+        case 'W':
+          rob.keyPress(KeyEvent.VK_W);
+          break;
 
-      case 'O':
-        rob.keyPress(KeyEvent.VK_O);
-        break;
+        case 'O':
+          rob.keyPress(KeyEvent.VK_O);
+          break;
 
-      case 'P':
-        rob.keyPress(KeyEvent.VK_P);
-        break;
+        case 'P':
+          rob.keyPress(KeyEvent.VK_P);
+          break;
 
-      case 'q':
-        rob.keyRelease(KeyEvent.VK_Q);
-        break;
+        case 'q':
+          rob.keyRelease(KeyEvent.VK_Q);
+          break;
 
-      case 'w':
-        rob.keyRelease(KeyEvent.VK_W);
-        break;
+        case 'w':
+          rob.keyRelease(KeyEvent.VK_W);
+          break;
 
-      case 'o':
-        rob.keyRelease(KeyEvent.VK_O);
-        break;
+        case 'o':
+          rob.keyRelease(KeyEvent.VK_O);
+          break;
 
-      case 'p':
-        rob.keyRelease(KeyEvent.VK_P);
-        break;
+        case 'p':
+          rob.keyRelease(KeyEvent.VK_P);
+          break;
 
-      case '+':
-        if (System.currentTimeMillis() > this.nextCheck) {
-          checkSpeed();
-        }
+        case '+':
+          if (System.currentTimeMillis() > this.nextCheck) {
+            checkSpeed();
+          }
 
-        int waitTime = (int) ((lastTick + delay) - System.currentTimeMillis());
-        if (waitTime > 0) {
-          doWait(waitTime);
-        }
-        long newTick = System.currentTimeMillis();
-        // log.logf("w=%03d d=%03d\n", waitTime, newTick - lastTick);
-        lastTick = newTick;
-        if ((this.timeLimit != 0) && (newTick > this.timeLimit)) {
-          this.stop = true;
-          return;
-        }
-        // After each delay, check the screen to see if it's finished
-        if (isFinished()) {
-          return;
-        }
-        break;
+          int waitTime = (int) ((lastTick + delay) - System.currentTimeMillis());
+          if (waitTime > 0) {
+            doWait(waitTime);
+          }
+          long newTick = System.currentTimeMillis();
+          // log.logf("w=%03d d=%03d\n", waitTime, newTick - lastTick);
+          lastTick = newTick;
+          if ((this.timeLimit != 0) && (newTick > this.timeLimit)) {
+            this.stop = true;
+            return;
+          }
+          // After each delay, check the screen to see if it's finished
+          if (isFinished()) {
+            return;
+          }
+          break;
 
-      default:
-        System.out.println("Unkown 'note': " + c);
+        default:
+          //unlikely to happen though as this string is given internally.
+          System.out.println("Unkown 'note': " + c);
       }
     }
   }
@@ -222,16 +278,16 @@ public class Qwopper {
 
   private static int keyIndex(char key) {
     switch (Character.toLowerCase(key)) {
-    case 'q':
-      return 0;
-    case 'w':
-      return 1;
-    case 'o':
-      return 2;
-    case 'p':
-      return 3;
-    default:
-      throw new IllegalArgumentException("Invalid key: " + key);
+      case 'q':
+        return 0;
+      case 'w':
+        return 1;
+      case 'o':
+        return 2;
+      case 'p':
+        return 3;
+      default:
+        throw new IllegalArgumentException("Invalid key: " + key);
     }
   }
 
@@ -316,6 +372,8 @@ public class Qwopper {
 
   private String string;
 
+  private String buffer;
+
   private int delay = DELAY;
 
   private int nbRuns;
@@ -365,17 +423,17 @@ public class Qwopper {
   public boolean isFinished() {
     Color col1 = rob.getPixelColor(origin[0] + 157, origin[1] + 126);
     if (colorMatches(
-        (col1.getRed() << 16) | (col1.getGreen() << 8) | col1.getBlue(),
-        0xffff00)) {
+          (col1.getRed() << 16) | (col1.getGreen() << 8) | col1.getBlue(),
+          0xffff00)) {
       Color col2 = rob.getPixelColor(origin[0] + 482, origin[1] + 126);
       if (colorMatches(
-          (col2.getRed() << 16) | (col2.getGreen() << 8) | col2.getBlue(),
-          0xffff00)) {
+            (col2.getRed() << 16) | (col2.getGreen() << 8) | col2.getBlue(),
+            0xffff00)) {
         finished = true;
         return true;
-      }
+            }
 
-    }
+          }
     finished = false;
     return false;
   }
@@ -437,7 +495,7 @@ public class Qwopper {
   public void refreshBrowser() {
     // Click out of the flash rectangle to give focus to the browser
     clickAt(rob, origin[0] - 5, origin[1] - 5);
-    
+
     // Reload (F5)
     rob.keyPress(KeyEvent.VK_F5);
     doWait(20);
@@ -471,7 +529,7 @@ public class Qwopper {
   }
 
   public RunInfo playOneGame(String str, long maxDuration) {
-    
+
     log.log("Playing " + str);
     doWait(500); // 0.5s wait to be sure QWOP is ready to run
     this.start = System.currentTimeMillis();
@@ -492,7 +550,7 @@ public class Qwopper {
       refreshBrowser();
       log.log("Refreshing browser");
     }
-    
+
     long end = System.currentTimeMillis();
     doWait(1000);
     float distance = Float.parseFloat(captureDistance());
@@ -502,7 +560,7 @@ public class Qwopper {
           distance);
     } else {
       info = new RunInfo(str, this.delay, distance < 100, false, end -
-                                                                 this.start,
+          this.start,
           distance);
     }
     return info;
