@@ -271,7 +271,7 @@ OUTER_LOOP:
       dur = 1;
     }
     float speed = (dist * 1000) / dur;
-    log.logf("%.1fm in %ds: speed=%.3f\n", dist, (dur / 1000), speed);
+    //log.logf("%.1fm in %ds: speed=%.3f\n", dist, (dur / 1000), speed);
   }
 
   private static int keyIndex(char key) {
@@ -529,7 +529,7 @@ OUTER_LOOP:
   public RunInfo playOneGame(String str, long maxDuration) {
     log.log("Playing " + str);
     String decodedString = decodeString(str);
-    log.log("Decoded" + decodedString);
+    log.log("Decoded " + decodedString);
     doWait(500); // 0.5s wait to be sure QWOP is ready to run
     this.start = System.currentTimeMillis();
     this.nextCheck = this.start + CHECK_INTERVAL;
@@ -553,14 +553,14 @@ OUTER_LOOP:
     long end = System.currentTimeMillis();
     doWait(1000);
     float distance = Float.parseFloat(captureDistance());
+    log.logf("%.1fm", distance);
     RunInfo info;
     if (stop) {
       info = new RunInfo(str, this.delay, false, true, end - this.start,
           distance);
     } else {
-      info = new RunInfo(str, this.delay, distance < 100, false, end -
-          this.start,
-          distance);
+      info = new RunInfo(str, this.delay, distance < 100, false, 
+          end - this.start, distance);
     }
     return info;
   }
