@@ -1,15 +1,12 @@
-#!usr/bin/python3
+#!usr/bin/jython
 import sys
-sys.path.append("../../src/communication")
-from communication import Communicator
-
-runs = ["ABDEAFCFEGHIABNOPABCONM", "ABDEAFCFEGHIABNOPABCONM"]
-# list of sequences, actually given by genetics.py
+sys.path.append("../../src/genetic")
+import genetic
 
 
 def main():
-    comm = Communicator()
-    comm.run(runs)
+    ret = genetic.solve()
+    print(ret)
 
 if __name__ == '__main__':
     main()
