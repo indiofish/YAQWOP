@@ -5,8 +5,8 @@ sys.path.append("../../src/communication")
 from communication import Communicator
 
 
-POOL_SIZE = 30
-SELECTION_SIZE = 10
+POOL_SIZE = 50
+SELECTION_SIZE = 15
 GENERATION_SIZE = 15
 comm = Communicator()
 KEYS = "ABCDEFGHIJKLMNOP"
@@ -15,11 +15,12 @@ KEYS = "ABCDEFGHIJKLMNOP"
 # do all the necessary stuff
 def solve():
     # default pool of genes for QWOP.
-    # TODO should use random strings later on
 
     pool = initiate()
 
-    for _ in range(GENERATION_SIZE):
+    for n in range(GENERATION_SIZE):
+        print("Generation " + str(n))
+        print(pool)
 
         # select genes from our pool
         chosen = select(pool)
@@ -32,8 +33,6 @@ def solve():
 
         # replace them
         pool = replacement
-
-        print(pool)
 
     # return target string
     return "ABCD"
@@ -60,7 +59,7 @@ def evaluate(pool):
 
 #  fitness function that returns a value when given distance, and duration.
 def fitness(dist, dur):
-    #  as of now we are only going to use distance as a fitness value.
+    # we will evaluate the distance travelled.
     return dist
 
 
