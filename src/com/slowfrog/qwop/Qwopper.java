@@ -192,16 +192,14 @@ OUTER_LOOP:
    */
 
   private void playString(String str) {
-    String decodedString = decodeString(str);
-    System.out.println(decodedString);
-    this.string = decodedString;
+    this.string = str;
     long lastTick = System.currentTimeMillis();
-    int len = decodedString.length();
+    int len = str.length();
     for (int i = 0; i < len; ++i) {
       if (stop) {
         return;
       }
-      char c = decodedString.charAt(i);
+      char c = str.charAt(i);
       switch (c) {
         case 'Q':
           rob.keyPress(KeyEvent.VK_Q);
@@ -529,8 +527,9 @@ OUTER_LOOP:
   }
 
   public RunInfo playOneGame(String str, long maxDuration) {
-
     log.log("Playing " + str);
+    String decodedString = decodeString(str);
+    log.log("Decoded" + decodedString);
     doWait(500); // 0.5s wait to be sure QWOP is ready to run
     this.start = System.currentTimeMillis();
     this.nextCheck = this.start + CHECK_INTERVAL;
@@ -540,7 +539,7 @@ OUTER_LOOP:
       this.timeLimit = 0;
     }
     while (!(isFinished() || stop)) {
-      playString(str);
+      playString(decodedString);
     }
     stopRunning();
     checkSpeed();
