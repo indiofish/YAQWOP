@@ -1,4 +1,4 @@
-#!usr/bin/jython
+#!/usr/bin/jython
 import sys
 sys.path.append("../../src/genetic")
 import genetic
