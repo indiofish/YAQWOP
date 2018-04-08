@@ -16,3 +16,9 @@ That will run five different random athletes, each one for ten tries.
 Currently, that simulation automatically stops the runner after one minute, to avoid wasting too much time on the first batch.
 
 (http://slowfrog.blogspot.com/2011/03/genetically-engineered-qwop-part-1.html)
+
+at src/ui/
+
+jython main.py
+
+or ./main.py
