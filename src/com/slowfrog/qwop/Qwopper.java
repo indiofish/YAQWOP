@@ -405,8 +405,8 @@ OUTER_LOOP:
   private static int[] findOrigin(Robot rob) {
     Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
     BufferedImage shot = rob.createScreenCapture(new Rectangle(dim));
-    for (int x = 0; x < dim.width; x += 4) {
-      for (int y = 0; y < dim.height; y += 4) {
+    for (int x = 0; x < dim.width; x += 1) {
+      for (int y = 0; y < dim.height; y += 1) {
         if (matchesBlueBorder(shot, x, y)) {
           int[] corner = slideTopLeft(shot, x, y);
           return new int[] { corner[0] - 124, corner[1] - 103 };
@@ -456,7 +456,7 @@ OUTER_LOOP:
    */
   public void startGame() {
     stop = false;
-    clickAt(rob, origin[0], origin[1]);
+    clickAt(rob, origin[0]+2, origin[1]+2);
     if (isFinished()) {
       clickKey(rob, KeyEvent.VK_SPACE);
     } else {
@@ -501,7 +501,7 @@ OUTER_LOOP:
 
     // Wait some time and try to find the window again
     for (int i = 0; i < 10; ++i) {
-      doWait(2000);
+      doWait(4000);
       try {
         this.findRealOrigin();
         return;

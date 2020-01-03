@@ -5,8 +5,8 @@ sys.path.append("../../src/communication")
 from communication import Communicator
 
 
-POOL_SIZE = 50
-SELECTION_SIZE = 15
+POOL_SIZE = 20
+SELECTION_SIZE = 10
 GENERATION_SIZE = 15
 comm = Communicator()
 KEYS = "ABCDEFGHIJKLMNOP"
@@ -60,7 +60,10 @@ def evaluate(pool):
 #  fitness function that returns a value when given distance, and duration.
 def fitness(dist, dur):
     # we will evaluate the distance travelled.
-    return dist
+    if dur < 1:
+        return 0
+    else:
+        return dist / dur
 
 
 def select(pool):
